@@ -1,0 +1,604 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>taoye@eileeness: ~ — 陶野 / Eileeness</title>
+<meta name="description" content="陶野 (Eileeness) — 10 年产品经理。IoT / 安全 / AI 落地 / 创业。一个可以敲命令探索的个人终端。Empowering & Forward-Looking。" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#060a08;
+  --bg-2:#08110c;
+  --phos:#4dff88;
+  --phos-soft:rgba(77,255,136,.55);
+  --phos-mute:rgba(77,255,136,.34);
+  --phos-faint:rgba(77,255,136,.14);
+  --white:#eafff0;
+  --amber:#ffcf6e;
+  --glow:0 0 8px rgba(77,255,136,.28);
+  --glow-strong:0 0 14px rgba(77,255,136,.45);
+}
+body.purple{
+  --bg:#0a0714;
+  --bg-2:#120b22;
+  --phos:#c084fc;
+  --phos-soft:rgba(192,132,252,.55);
+  --phos-mute:rgba(192,132,252,.34);
+  --phos-faint:rgba(192,132,252,.14);
+  --white:#f6ecff;
+  --amber:#ffd6a5;
+  --glow:0 0 8px rgba(192,132,252,.3);
+  --glow-strong:0 0 14px rgba(192,132,252,.48);
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0;background:var(--bg);color:var(--phos);
+  font-family:"JetBrains Mono","Noto Sans SC",ui-monospace,SFMono-Regular,Menlo,monospace;
+  font-size:16px;line-height:1.75;overflow:hidden;
+  -webkit-font-smoothing:antialiased;
+}
+::selection{background:var(--phos);color:var(--bg)}
+a{color:var(--phos)}
+
+/* ---------- CRT overlays ---------- */
+.crt{position:fixed;inset:0;pointer-events:none;z-index:60;
+  background:repeating-linear-gradient(0deg, rgba(0,0,0,.30) 0 1px, transparent 1px 3px);
+  opacity:.5;
+}
+.crt::before{content:"";position:absolute;inset:0;
+  background:radial-gradient(ellipse 120% 90% at 50% 45%, transparent 55%, rgba(0,0,0,.55) 100%);}
+.crt::after{content:"";position:absolute;inset:0;background:var(--phos);opacity:.015;
+  animation:flick 5s steps(3,end) infinite;}
+@keyframes flick{0%,100%{opacity:.015}8%{opacity:.035}9%{opacity:.012}46%{opacity:.028}47%{opacity:.015}}
+.scan{position:fixed;left:0;right:0;height:140px;z-index:61;pointer-events:none;
+  background:linear-gradient(180deg,transparent,rgba(77,255,136,.045),transparent);
+  animation:scan 8s linear infinite;}
+body.purple .scan{background:linear-gradient(180deg,transparent,rgba(192,132,252,.05),transparent)}
+@keyframes scan{from{top:-20%}to{top:110%}}
+
+/* ---------- terminal chrome ---------- */
+.term{position:relative;z-index:1;height:100vh;height:100dvh;display:flex;flex-direction:column;
+  background:
+    radial-gradient(1000px 500px at 50% -10%, var(--phos-faint), transparent 65%),
+    linear-gradient(180deg,var(--bg-2),var(--bg) 40%);
+}
+.titlebar{
+  flex:0 0 auto;display:flex;align-items:center;gap:14px;
+  padding:9px 16px;border-bottom:1px solid var(--phos-faint);
+  background:rgba(0,0,0,.35);
+  font-size:12.5px;letter-spacing:.08em;color:var(--phos-soft);
+}
+.titlebar .dots{display:flex;gap:6px}
+.titlebar .dots i{width:9px;height:9px;border-radius:50%;border:1px solid var(--phos-mute);display:block}
+.titlebar .dots i:first-child{background:var(--phos-faint)}
+.titlebar .tb-title{flex:1;text-align:center;color:var(--phos-soft);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.titlebar .tb-right{color:var(--phos-mute);white-space:nowrap}
+
+.screen{flex:1 1 auto;overflow-y:auto;padding:30px 32px 18px;scrollbar-width:thin;
+  scrollbar-color:var(--phos-mute) transparent;text-shadow:var(--glow);}
+.screen::-webkit-scrollbar{width:8px}
+.screen::-webkit-scrollbar-thumb{background:var(--phos-faint);border-radius:4px}
+.stage{width:100%;max-width:960px;margin:0 auto}
+
+.logo-line{
+  margin:0;color:var(--phos);text-shadow:var(--glow-strong);
+  font-size:clamp(7px, 1.9vw, 17px);line-height:1.18;letter-spacing:0;
+  user-select:none;text-align:center;white-space:pre;
+}
+.logo-sub{
+  margin:0 0 18px;font-size:13.5px;letter-spacing:.3em;color:var(--phos-soft);
+  text-transform:uppercase;text-align:center;
+}
+.logo-sub b{color:var(--white);font-weight:500}
+
+/* ---------- wechat qr ---------- */
+.qr-block{margin:0 0 22px;display:flex;align-items:center;justify-content:center;gap:20px;flex-wrap:wrap}
+.qr-frame{
+  padding:9px;background:#fff;border:1px solid var(--phos-soft);
+  box-shadow:0 0 26px rgba(77,255,136,.18);flex:0 0 auto;
+}
+body.purple .qr-frame{box-shadow:0 0 26px rgba(192,132,252,.2)}
+.qr-frame img{display:block;width:176px;height:176px;image-rendering:pixelated}
+
+/* ---------- divider ---------- */
+.divider{width:min(460px,72%);margin:0 auto 20px;border-top:1px dashed var(--phos-faint);transform-origin:center}
+.divider.grow{animation:growx .4s cubic-bezier(.2,.7,.3,1) both}
+@keyframes growx{from{transform:scaleX(0);opacity:0}to{transform:scaleX(1);opacity:1}}
+
+/* ---------- console (output + input), centered as a block ---------- */
+.console{width:min(100%,78ch);margin:8px auto 0}
+
+/* ---------- intro typing effects ---------- */
+body.intro .cmdline .mirror .cursor{animation:none;opacity:1}
+.printing{animation:print .5s steps(14,end) both}
+@keyframes print{from{clip-path:inset(0 0 100% 0);opacity:.35}to{clip-path:inset(0 0 0 0);opacity:1}}
+
+/* ---------- command cheat sheet ---------- */
+.cheat{margin:0 0 6px}
+.cheat .head, .head-center{color:var(--phos-mute);text-align:center;margin-bottom:4px}
+
+.line{white-space:pre-wrap;word-break:break-word;margin:0 0 2px;line-height:1.65}
+.line.gap{height:12px}
+.dim{color:var(--phos-soft)}
+.mute{color:var(--phos-mute)}
+.bright{color:var(--white);text-shadow:var(--glow-strong)}
+.amber{color:var(--amber)}
+.echo .p{color:var(--phos-soft)}
+.echo .c{color:var(--white)}
+
+a.ln{color:var(--phos);text-decoration:underline;text-underline-offset:3px;
+  text-decoration-color:var(--phos-mute);transition:text-shadow .15s,color .15s}
+a.ln:hover{color:var(--white);text-shadow:var(--glow-strong)}
+
+.col{display:inline-block;vertical-align:top}
+.c-perm{width:11ch;color:var(--phos-mute)}
+.c-name{width:13ch}
+.c-lang{width:11ch;color:var(--phos-soft)}
+.c-star{width:5ch;color:var(--amber)}
+.c-key{width:11ch;color:var(--phos-soft)}
+.c-cmd{width:17ch;color:var(--white)}
+.c-val{color:var(--white)}
+.rule{color:var(--phos-mute)}
+.md-h1{color:var(--white);text-shadow:var(--glow-strong);font-weight:700}
+.md-h2{color:var(--phos);font-weight:700;margin-top:10px}
+.md-h2 .hash{color:var(--phos-mute);font-weight:400}
+
+/* ---------- command line (lives inside the output flow) ---------- */
+.cmdline{display:flex;gap:10px;align-items:baseline;margin:8px 0 2px}
+.cmdline .prompt{color:var(--phos-soft);white-space:nowrap}
+.cmdline .prompt .at{color:var(--phos-mute)}
+.inputwrap{position:relative;flex:1;min-width:0}
+.mirror{visibility:hidden;white-space:pre}
+.mirror .cursor{visibility:visible;display:inline-block;width:.62em;height:1.1em;
+  background:var(--phos);vertical-align:text-bottom;margin-left:1px;
+  box-shadow:var(--glow);animation:blink 1.06s steps(1) infinite;}
+@keyframes blink{0%,49%{opacity:1}50%,100%{opacity:0}}
+.cmdinput{
+  position:absolute;inset:0;width:100%;background:transparent;border:0;outline:0;
+  color:var(--white);font:inherit;text-shadow:var(--glow);caret-color:transparent;padding:0;
+}
+
+/* ---------- quick dock ---------- */
+.dock{
+  flex:0 0 auto;display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap;
+  padding:10px 16px;border-top:1px solid var(--phos-faint);background:rgba(0,0,0,.4);
+}
+.dock .dock-label{font-size:12px;letter-spacing:.2em;color:var(--phos-mute);text-transform:uppercase;margin-right:4px}
+.dock button{
+  font:inherit;font-size:13.5px;color:var(--phos-soft);background:transparent;
+  border:1px solid var(--phos-faint);padding:6px 12px;cursor:pointer;
+  transition:all .18s ease;letter-spacing:.02em;
+}
+.dock button:hover{color:var(--white);border-color:var(--phos-soft);
+  background:var(--phos-faint);text-shadow:var(--glow);}
+.dock button .d{color:var(--phos-mute)}
+.dock .hint{width:100%;order:9;margin-left:0;text-align:center;font-size:12px;color:var(--phos-mute)}
+
+@media (max-width:700px){
+  body{font-size:14px}
+  .screen{padding:20px 16px 12px}
+  .logo{font-size:7px}
+  .qr-frame img{width:140px;height:140px}
+  .titlebar .tb-right{display:none}
+  .dock .hint{display:none}
+  .c-perm{display:none}
+  .c-name{width:12ch}
+  .c-lang{width:11ch}
+}
+</style>
+</head>
+<body>
+
+<div class="crt"></div>
+<div class="scan"></div>
+
+<div class="term">
+  <div class="titlebar">
+    <span class="dots"><i></i><i></i><i></i></span>
+    <span class="tb-title">taoye@eileeness: ~ — zsh · 个人终端 v10.0</span>
+    <span class="tb-right">UTF-8 · CN/EN · <span id="clock">--:--:--</span></span>
+  </div>
+
+  <div class="screen" id="screen">
+  <div class="stage">
+    <div class="console">
+    <div id="out"></div>
+    </div>
+  </div>
+  </div>
+
+  <div class="dock">
+    <span class="dock-label">quick</span>
+    <button data-cmd="whoami"><span class="d">$ </span>whoami</button>
+    <button data-cmd="ls skills/"><span class="d">$ </span>ls skills/</button>
+    <button data-cmd="cat story.md"><span class="d">$ </span>cat story.md</button>
+    <button data-cmd="ls projects/"><span class="d">$ </span>ls projects/</button>
+    <button data-cmd="./contact"><span class="d">$ </span>./contact</button>
+    <button data-cmd="clear"><span class="d">$ </span>clear</button>
+    <span class="hint">↑↓ 历史 · Tab 补全 · 开场动画可按任意键跳过</span>
+  </div>
+</div>
+
+<script>
+(function(){
+  var out = document.getElementById('out');
+  var screen = document.getElementById('screen');
+
+  /* ---------- data ---------- */
+  var PROJECTS = [
+    {name:'pi-desktop', lang:'TypeScript', star:'★23', tag:'iot', url:'https://github.com/Eileenes/pi-desktop',
+     desc:'Pi 桌面应用：给硬件能力套一层好用的 GUI'},
+    {name:'BrowseGate', lang:'Python', star:'★0', tag:'sec', url:'https://github.com/Eileenes/BrowseGate',
+     desc:'AI Agent 受治理网页网关：动作过策略引擎'},
+    {name:'SwarmPilot', lang:'Python', star:'★0', tag:'ai', url:'https://github.com/Eileenes/SwarmPilot',
+     desc:'轻量 Agent Swarm 协调器：DAG 分解+路由'},
+    {name:'SkillAtlas', lang:'Python', star:'★0', tag:'ai', url:'https://github.com/Eileenes/SkillAtlas',
+     desc:'AI Agent Skill 开放市场：发布/发现/安装'}
+  ];
+  var CONTACT = [
+    {k:'email', v:'taoyeyeah@gmail.com', href:'mailto:taoyeyeah@gmail.com', note:'click to mail'},
+    {k:'github', v:'github.com/Eileenes', href:'https://github.com/Eileenes', note:'13+ public repos'},
+    {k:'x', v:'x.com/Eileeness160708', href:'https://x.com/Eileeness160708', note:'thoughts in public'},
+    {k:'公众号', v:'多叻叻', href:null, note:'微信搜索「多叻叻」'},
+    {k:'小红书', v:'Fword', href:null, note:'小红书搜索「Fword」'}
+  ];
+
+  function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+  function line(html, cls){
+    var d = document.createElement('div');
+    d.className = 'line' + (cls ? ' ' + cls : '');
+    d.innerHTML = html;
+    out.appendChild(d);
+    return d;
+  }
+  function gap(){ line('', 'gap'); }
+  function echo(c){
+    line('<span class="p">taoye@eileeness:~$</span> <span class="c">' + esc(c) + '</span>', 'echo');
+  }
+  function scroll(){ screen.scrollTop = screen.scrollHeight; }
+
+  /* ---------- outputs ---------- */
+  function oHelp(){
+    gap();
+    line('<span class="dim">available commands:</span>');
+    [['whoami','我是谁 · 定位 / 信念 / 关键词'],
+     ['ls skills/','四条主线 · IOT / FOUNDER / SEC / AI'],
+     ['cat story.md','经历自述 · 按方向排的十年'],
+     ['ls projects/','代表开源项目 · 点击名字直达仓库'],
+     ['./contact','联系方式 · 邮箱 / GitHub / X / 公众号 / 小红书'],
+     ['theme purple|green','换磷光色 · 赛博紫 or 经典绿'],
+     ['clear','清屏']
+    ].forEach(function(r){
+      line('<span class="c-cmd col">' + esc(r[0]) + '</span><span class="dim">' + esc(r[1]) + '</span>');
+    });
+    gap();
+    line('<span class="mute">不会命令行也没关系：点底部按钮、点输出里的链接，效果一样。</span>');
+  }
+
+  function oWhoami(){
+    gap();
+    line('<span class="bright">陶野  /  Eileeness</span>');
+    line('<span class="dim">Product Manager · 10 years · CN/EN</span>');
+    line('<span class="c-key col">tagline</span>: <span class="c-val">Empowering &amp; Forward-Looking</span>');
+    line('<span class="c-key col">belief</span> : <span class="c-val">好产品是"克制的锋利"——把复杂留给系统，把简单留给用户。</span>');
+    line('<span class="c-key col">keywords</span>: <span class="c-val">好奇 / 动手 / 长期主义 / 拆问题 / 共情 / 直接</span>');
+    line('<span class="c-key col">github</span> : <span class="dim">@Eileenes · 会动手的 PM 才有发言权</span>');
+  }
+
+  function oSkills(){
+    gap();
+    [['IOT/','物联网产品 · 设备端 ↔ 云端，硬件 × 软件'],
+     ['FOUNDER/','创业 · 0→1，现金流意识'],
+     ['SEC/','安全产品 · 治理 / 审计 / 网关'],
+     ['AI/','AI 落地 · Agent / Prompt / Skill 进工作流']
+    ].forEach(function(r){
+      line('<span class="c-perm col">drwxr-xr-x</span><span class="c-name col bright">' + esc(r[0]) + '</span><span class="dim">' + esc(r[1]) + '</span>');
+    });
+    line('<span class="mute">4 directories, 0 excuses</span>');
+  }
+
+  function oStory(){
+    gap();
+    line('<span class="md-h1"># story.md</span>');
+    line('<span class="c-val">十年产品经理。没写过惊天动地的代码，但一直待在"东西怎么被造出来"这条线上。</span>');
+    line('<span class="md-h2"><span class="hash">## </span>IOT/  物联网产品</span>');
+    line('<span class="dim">从设备端到云端。硬件"不能改"，软件"还能改"——产品站在中间做翻译，也做取舍。</span>');
+    line('<span class="md-h2"><span class="hash">## </span>FOUNDER/  创业</span>');
+    line('<span class="dim">做过创始人，知道现金流有多重。现在每个需求先问一句：值不值得花下一块钱。</span>');
+    line('<span class="md-h2"><span class="hash">## </span>SEC/  安全产品</span>');
+    line('<span class="dim">安全不是把门锁死，是让该发生的能发生、不该发生的被记录、被审计。Agent 时代尤其如此。</span>');
+    line('<span class="md-h2"><span class="hash">## </span>AI/  AI 落地</span>');
+    line('<span class="dim">不追概念，只看明天能不能用。把 Agent / Prompt / Skill 做小、做稳、做进真实工作流。</span>');
+    line('<span class="rule">---</span>');
+    line('<span class="dim">GitHub bio 写着 "I\'m Robot." 但产品这件事，最后还是要回到人。</span>');
+  }
+
+  function oProjects(){
+    gap();
+    line('<span class="mute">total 4 · 点名字直达仓库 · 或 open &lt;name&gt;</span>');
+    PROJECTS.forEach(function(p){
+      line('<span class="c-perm col">-rw-r--r--</span>' +
+           '<span class="c-name col"><a class="ln" href="' + p.url + '" target="_blank" rel="noopener">' + esc(p.name) + '</a></span>' +
+           '<span class="c-lang col">' + esc(p.lang) + '</span>' +
+           '<span class="c-star col">' + esc(p.star) + '</span>' +
+           '<span class="dim">' + esc(p.desc) + '</span>');
+    });
+    line('<span class="mute">更多仓库: </span><a class="ln" href="https://github.com/Eileenes?tab=repositories" target="_blank" rel="noopener">github.com/Eileenes?tab=repositories</a>');
+  }
+
+  function oContact(){
+    gap();
+    line('<span class="dim">5 channels online · 带下划线的可以直接点</span>');
+    CONTACT.forEach(function(c){
+      var v = c.href
+        ? '<a class="ln" href="' + c.href + '"' + (c.href.indexOf('mailto:')===0?'':' target="_blank" rel="noopener"') + '>' + esc(c.v) + '</a>'
+        : '<span class="c-val">' + esc(c.v) + '</span>';
+      line('<span class="c-key col">' + esc(c.k) + '</span><span>' + v + '</span>  <span class="mute">' + esc(c.note) + '</span>');
+    });
+  }
+
+  /* ---------- dispatch ---------- */
+  var CMDS = ['whoami','ls skills/','cat story.md','ls projects/','./contact','contact','help','clear','theme purple','theme green'];
+  function run(raw){
+    var c = raw.trim();
+    if(!c) return;
+    var lc = c.toLowerCase();
+    if(lc === 'clear'){ out.innerHTML = ''; return; }
+    if(lc === 'help' || lc === '?'){ oHelp(); }
+    else if(lc === 'whoami'){ oWhoami(); }
+    else if(lc === 'ls' || lc === 'ls skills/' || lc === 'ls skills'){ oSkills(); }
+    else if(lc === 'cat story.md'){ oStory(); }
+    else if(lc === 'ls projects/' || lc === 'ls projects'){ oProjects(); }
+    else if(lc === './contact' || lc === 'contact'){ oContact(); }
+    else if(lc === 'theme purple'){ document.body.classList.add('purple'); line('<span class="dim">theme → cyber purple</span>'); }
+    else if(lc === 'theme green'){ document.body.classList.remove('purple'); line('<span class="dim">theme → phosphor green</span>'); }
+    else if(lc.indexOf('open ') === 0){
+      var n = c.slice(5).trim().toLowerCase();
+      var hit = null;
+      PROJECTS.forEach(function(p){ if(p.name.toLowerCase() === n) hit = p; });
+      if(hit){ line('<span class="dim">opening </span><span class="bright">' + esc(hit.name) + '</span><span class="dim"> …</span>'); window.open(hit.url, '_blank'); }
+      else line('<span class="amber">open: no such project: ' + esc(n) + '</span><span class="mute"> · 试试 ls projects/</span>');
+    }
+    else if(lc.indexOf('sudo') === 0){
+      line('<span class="amber">sudo: 权限没有，咖啡可以。</span><span class="dim"> mailto:taoyeyeah@gmail.com</span>');
+    }
+    else if(lc === 'exit' || lc === 'logout'){
+      line('<span class="dim">logout 失败：这一页就是我自己。</span><span class="mute"> 想带走点什么？./contact</span>');
+    }
+    else if(lc.indexOf('rm ') === 0){
+      line('<span class="amber">permission denied:</span><span class="dim"> 这里只有简历，没有垃圾。</span>');
+    }
+    else{
+      line('<span class="amber">zsh: command not found: ' + esc(c) + '</span>');
+      line('<span class="mute">敲 help 看命令清单，或直接点底部按钮。</span>');
+    }
+    scroll();
+  }
+
+  /* ---------- live prompt line (real terminal order) ---------- */
+  var history = [], hIdx = 0;
+  var live = null;
+  var skip = false, introRunning = true, pendingCmd = null;
+
+  function syncMirror(){
+    if(!live) return;
+    live.mirror.innerHTML = esc(live.input.value) + '<span class="cursor"></span>';
+  }
+  function newPrompt(){
+    var d = document.createElement('div');
+    d.className = 'line cmdline';
+    d.innerHTML = '<span class="prompt">taoye@eileeness<span class="at">:~</span>$</span>' +
+      '<span class="inputwrap"><span class="mirror"></span><input class="cmdinput" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="终端命令输入" /></span>';
+    out.appendChild(d);
+    live = { root:d, mirror:d.querySelector('.mirror'), input:d.querySelector('.cmdinput') };
+    live.input.addEventListener('input', syncMirror);
+    live.input.addEventListener('keydown', onKey);
+    syncMirror(); scroll();
+    return live;
+  }
+  function finalize(v){
+    if(!live) return;
+    live.root.innerHTML = '<span class="p">taoye@eileeness:~$</span> <span class="c">' + esc(v) + '</span>';
+    live.root.className = 'line echo';
+    live = null;
+  }
+  function exec(v){
+    var isClear = v.trim().toLowerCase() === 'clear';
+    finalize(v);
+    if(isClear){ setTimeout(replay, 0); return; }
+    run(v);
+    newPrompt();
+    live.input.focus({preventScroll:true});
+  }
+  function onKey(e){
+    if(e.key === 'Enter'){
+      var v = live.input.value;
+      if(introRunning){ skip = true; if(v.trim()) pendingCmd = v.trim(); return; }
+      if(v.trim()){ history.push(v); hIdx = history.length; }
+      exec(v);
+    } else if(e.key === 'ArrowUp'){
+      if(hIdx > 0){ hIdx--; live.input.value = history[hIdx] || ''; syncMirror(); e.preventDefault(); }
+    } else if(e.key === 'ArrowDown'){
+      if(hIdx < history.length){ hIdx++; live.input.value = history[hIdx] || ''; syncMirror(); e.preventDefault(); }
+    } else if(e.key === 'Tab'){
+      e.preventDefault();
+      var pre = live.input.value.toLowerCase();
+      if(!pre) return;
+      var m = CMDS.filter(function(x){ return x.indexOf(pre) === 0; });
+      if(m.length === 1){ live.input.value = m[0]; syncMirror(); }
+      else if(m.length > 1){ line('<span class="mute">' + m.map(esc).join('   ') + '</span>'); scroll(); }
+    } else if(introRunning){
+      skip = true;
+    }
+  }
+
+  screen.addEventListener('click', function(e){
+    if(e.target.closest('a') || e.target.closest('button')) return;
+    if(introRunning){ skip = true; return; }
+    if(live) live.input.focus({preventScroll:true});
+  });
+  document.addEventListener('keydown', function(e){
+    if(introRunning && !(live && e.target === live.input)) skip = true;
+  });
+  document.querySelectorAll('.dock button').forEach(function(b){
+    b.addEventListener('click', function(){
+      var c = b.getAttribute('data-cmd');
+      if(introRunning){ skip = true; pendingCmd = c; return; }
+      exec(c);
+    });
+  });
+
+  /* ---------- clock ---------- */
+  var clock = document.getElementById('clock');
+  function tick(){
+    var d = new Date(), p = function(n){ return (n<10?'0':'')+n; };
+    clock.textContent = p(d.getHours())+':'+p(d.getMinutes())+':'+p(d.getSeconds());
+  }
+  tick(); setInterval(tick, 1000);
+
+  /* ---------- intro: blinking cursor → type command → print all ---------- */
+  var BOOT = [
+    ['<span class="dim">[ OK ]</span> <span class="c-key col">contact</span> <a class="ln" href="mailto:taoyeyeah@gmail.com">taoyeyeah@gmail.com</a><span class="dim"> · </span><a class="ln" href="https://github.com/Eileenes" target="_blank" rel="noopener">github.com/Eileenes</a><span class="dim"> · </span><a class="ln" href="https://x.com/Eileeness160708" target="_blank" rel="noopener">x.com/Eileeness160708</a>', ''],
+    ['<span class="dim">[ OK ]</span> <span class="c-key col">wechat</span> <span class="dim">扫码加我微信 · 公众号「多叻叻」 · 小红书「Fword」 · </span><span class="bright">./contact</span><span class="dim"> 看全部渠道</span>', ''],
+    ['<span class="dim">[ OK ]</span> <span class="c-key col">identity</span> <span class="bright">陶野 / Eileeness</span><span class="dim"> · Product Manager · 10 years</span>', ''],
+    ['<span class="dim">[ OK ]</span> <span class="c-key col">tracks</span> <span class="dim">IOT/  FOUNDER/  SEC/  AI/</span>', ''],
+    ['<span class="dim">[ OK ]</span> <span class="c-key col">session</span> <span class="dim">interactive · 敲 </span><span class="bright">help</span><span class="dim"> 看命令，或点底部按钮</span>', '']
+  ];
+  var LOGO_LINES = [
+    ' _____ ___ _     _____ _____ _   _ _____ ____ ____',
+    '| ____||_ _|| |   | ____|| ____|| \\ | || ____||/ ___|/ ___|',
+    '|  _|   | |  | |   |  _|  |  _|  |  \\| ||  _|  \\___ \\\\___ \\',
+    '| |___  | |  | |___| |___ | |___ | |\\  || |___  ___) |___) |',
+    '|_____||___||_____||_____||_____||_| \\_||_____||____/|____/'
+  ];
+  var SUB_HTML = '<b>陶野</b> · PRODUCT MANAGER · 10Y · EMPOWERING &amp; FORWARD-LOOKING';
+  var CHEAT = [
+    '<span class="c-cmd col">whoami</span><span class="dim">我是谁 · 定位 / 信念 / 关键词</span>',
+    '<span class="c-cmd col">ls skills/</span><span class="dim">四条主线 · IOT / FOUNDER / SEC / AI</span>',
+    '<span class="c-cmd col">cat story.md</span><span class="dim">经历自述 · 按方向排的十年</span>',
+    '<span class="c-cmd col">ls projects/</span><span class="dim">代表开源项目 · 点名字直达仓库</span>',
+    '<span class="c-cmd col">./contact</span><span class="dim">联系方式 · 邮箱 / GitHub / X / 公众号 / 小红书</span>',
+    '<span class="c-cmd col">theme purple</span><span class="dim">换赛博紫 · theme green 换回经典绿</span>',
+    '<span class="c-cmd col">clear</span><span class="dim">清屏 · 另：sudo / rm / exit 有彩蛋</span>'
+  ];
+  var CUR = '<span class="cursor"></span>';
+
+  function wait(ms){ return new Promise(function(r){ setTimeout(r, skip ? 0 : ms); }); }
+  function cutPoints(html){
+    var pts = [];
+    for(var i=0;i<html.length;i++){
+      if(html[i] === '<'){ var j = html.indexOf('>', i); i = (j === -1 ? html.length : j); continue; }
+      pts.push(i+1);
+    }
+    return pts;
+  }
+  function typeInto(el, html, ms){
+    return new Promise(function(res){
+      var pts = cutPoints(html), k = 0;
+      (function step(){
+        if(skip || k >= pts.length){ el.innerHTML = html; scroll(); res(); return; }
+        k++;
+        el.innerHTML = html.slice(0, pts[k]) + CUR;
+        scroll();
+        setTimeout(step, ms);
+      })();
+    });
+  }
+  function typedLine(html, cls, ms){ return typeInto(line('', cls), html, ms); }
+  function printBlock(el, ms){
+    return new Promise(function(res){
+      el.classList.add('printing');
+      setTimeout(function(){ el.classList.remove('printing'); scroll(); res(); }, skip ? 0 : ms);
+    });
+  }
+
+  function bootPrint(){
+    var chain = Promise.resolve();
+    LOGO_LINES.forEach(function(t){ chain = chain.then(function(){ return typedLine(t, 'logo-line', 3); }); });
+    chain = chain.then(function(){ return typedLine(SUB_HTML, 'logo-sub', 8); });
+    chain = chain.then(function(){
+      var qr = document.createElement('div');
+      qr.className = 'qr-block';
+      qr.innerHTML = '<div class="qr-frame"><img src="wechat-qr.png" alt="微信二维码 · 扫码添加陶野" /></div>';
+      out.appendChild(qr);
+      return printBlock(qr, 520);
+    });
+    chain = chain.then(function(){
+      var dv = document.createElement('div');
+      dv.className = 'divider grow';
+      out.appendChild(dv); scroll();
+      return wait(430);
+    });
+    chain = chain.then(function(){
+      var cheat = document.createElement('div');
+      cheat.className = 'cheat';
+      out.appendChild(cheat);
+      var head = document.createElement('div');
+      head.className = 'line head';
+      cheat.appendChild(head);
+      return typeInto(head, '# 可用命令 · 直接敲，或点底部按钮', 6).then(function(){
+        var c2 = Promise.resolve();
+        CHEAT.forEach(function(html){
+          c2 = c2.then(function(){
+            var cl = document.createElement('div');
+            cl.className = 'line';
+            cheat.appendChild(cl);
+            return typeInto(cl, html, 6);
+          });
+        });
+        return c2;
+      });
+    });
+    chain = chain.then(function(){ line('', 'gap'); return wait(80); });
+    BOOT.forEach(function(b){ chain = chain.then(function(){ return typedLine(b[0], b[1], 5); }); });
+    return chain;
+  }
+
+  function intro(){
+    document.body.classList.add('intro');
+    newPrompt();
+    wait(850).then(function(){
+      var cmdText = './boot --profile=taoye', i = 0;
+      return new Promise(function(resolve){
+        (function step(){
+          if(skip || i >= cmdText.length){ if(live){ live.input.value = cmdText; syncMirror(); } resolve(); return; }
+          i++; if(live){ live.input.value = cmdText.slice(0, i); syncMirror(); }
+          setTimeout(step, 34);
+        })();
+      });
+    }).then(function(){ return wait(240); })
+      .then(function(){
+        var v = live ? live.input.value : './boot --profile=taoye';
+        finalize(v);
+        return bootPrint();
+      })
+      .then(function(){
+        line('', 'gap');
+        document.body.classList.remove('intro');
+        introRunning = false;
+        newPrompt();
+        screen.scrollTop = 0;
+        live.input.focus({preventScroll:true});
+        if(pendingCmd){ var p = pendingCmd; pendingCmd = null; exec(p); }
+      });
+  }
+
+  intro();
+
+  /* clear → 重新播放开场动画，回到最初界面 */
+  function replay(){
+    out.innerHTML = '';
+    live = null;
+    skip = false;
+    introRunning = true;
+    pendingCmd = null;
+    intro();
+  }
+})();
+</script>
+</body>
+</html>
